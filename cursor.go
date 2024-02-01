@@ -1,4 +1,4 @@
-package csvchunker
+package csvutil
 
 import (
 	"fmt"
