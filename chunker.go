@@ -29,7 +29,7 @@ func (chunker *Chunker[T]) SetHeader(filename string) {
 	// Set response header
 	chunker.GinCtx.Header("Content-Type", "text/csv; charset=utf-8")
 	chunker.GinCtx.Header("Transfer-Encoding", "chunked")
-	chunker.GinCtx.Header("Content-Disposition", "attachment;filename="+filename+".csv")
+	chunker.GinCtx.Header("Content-Disposition", "attachment;filename='"+filename+".csv'")
 
 	// TODO: make it possible to select BOM
 	// BOM encoding UTF-8
