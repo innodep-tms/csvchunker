@@ -3,6 +3,7 @@ package csvutil
 import (
 	"encoding/csv"
 	"errors"
+	"net/http"
 
 	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
@@ -27,12 +28,14 @@ func NewChunker[T any](ginContext *gin.Context) *Chunker[T] {
 // Transfer-Encoding is set to chunked.
 func (chunker *Chunker[T]) SetHeader(filename string) {
 	// Set response header
+	chunker.GinCtx.Status(http.StatusOK)
 	chunker.GinCtx.Header("Content-Type", "text/csv; charset=utf-8")
 	chunker.GinCtx.Header("Transfer-Encoding", "chunked")
 	chunker.GinCtx.Header("Content-Disposition", `attachment;filename="`+filename+`.csv"`)
+	chunker.GinCtx.Header("Content-Description", "File Transfer")
 
 	// TODO: make it possible to select BOM
-	// BOM encoding UTF-8
+	// Now, use BOM of UTF-8 representation
 	chunker.GinCtx.Writer.Write([]byte("\xEF\xBB\xBF"))
 }
 
@@ -85,13 +88,9 @@ func TransferChunk[T any](chunker *Chunker[T], cursor *Cursor[T]) error {
 	var err error
 	for data, err = cursor.FetchCursor(); err == nil && len(data) > 0; data, err = cursor.FetchCursor() {
 		if err = chunker.WriteChunk(data); err != nil {
-			break
+			return err
 		}
 		chunker.ResetWriter()
-	}
-
-	if err != nil {
-		return err
 	}
 
 	return nil
