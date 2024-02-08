@@ -4,6 +4,8 @@ import (
 	"encoding/csv"
 	"errors"
 	"net/http"
+	"reflect"
+	"strconv"
 
 	"github.com/fatih/structs"
 	"github.com/gin-gonic/gin"
@@ -58,7 +60,31 @@ func (chunker *Chunker[T]) WriteChunk(data []T) error {
 		row := []string{}
 		for _, f := range structs.Fields(data[i]) {
 			if label := f.Tag("csv"); label != "" {
-				row = append(row, f.Value().(string))
+				value := ""
+				switch reflect.TypeOf(f.Value()).String() {
+				case "string":
+					value = f.Value().(string)
+				case "*string":
+					value = *f.Value().(*string)
+				case "int":
+					value = strconv.Itoa(f.Value().(int))
+				case "*int":
+					value = strconv.Itoa(*f.Value().(*int))
+				case "int64":
+					value = strconv.FormatInt(f.Value().(int64), 10)
+				case "*int64":
+					value = strconv.FormatInt(*f.Value().(*int64), 10)
+				case "float32":
+					value = strconv.FormatFloat(float64(f.Value().(float32)), 'f', -6, 32)
+				case "*float32":
+					value = strconv.FormatFloat(float64(*f.Value().(*float32)), 'f', -6, 32)
+				case "float64":
+					value = strconv.FormatFloat(f.Value().(float64), 'f', -6, 64)
+				case "*float64":
+					value = strconv.FormatFloat(*f.Value().(*float64), 'f', -6, 64)
+				}
+
+				row = append(row, value)
 			}
 		}
 
