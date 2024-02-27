@@ -110,9 +110,7 @@ func TransferChunk[T any](chunker *Chunker[T], cursor *Cursor[T]) error {
 		return errors.New("Need to initialize chunker and cursor")
 	}
 
-	data := make([]T, 0)
-	var err error
-	for data, err = cursor.FetchCursor(); err == nil && len(data) > 0; data, err = cursor.FetchCursor() {
+	for data, err := cursor.FetchCursor(); err == nil && len(data) > 0; data, err = cursor.FetchCursor() {
 		if err = chunker.WriteChunk(data); err != nil {
 			return err
 		}
@@ -129,9 +127,13 @@ func TransferChunk[T any](chunker *Chunker[T], cursor *Cursor[T]) error {
 // 3. Fetches the data from the cursor and writes the data in chunks.
 // 4. Resets the writer.
 // Need to gin.Context and gorm.DB to use this function.
-// The query is the SQL query to be executed, and the filename is the name of the file to be downloaded.
 // The fetchSize is the number of rows to be fetched at a time.
-func TransferCSVFileChunked[T any](ginContext *gin.Context, dbconn *gorm.DB, query, filename string, chunkSize int) error {
+func TransferCSVFileChunked[T any](
+	ginContext *gin.Context, dbconn *gorm.DB,
+	query, filename string,
+	chunkSize int,
+) error {
+
 	chunker := NewChunker[T](ginContext)
 	defer chunker.Writer.Flush()
 
