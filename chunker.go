@@ -133,14 +133,16 @@ func TransferChunk[T any](chunker *Chunker[T], cursor *Cursor[T]) error {
 // The fetchSize is the number of rows to be fetched at a time.
 func TransferCSVFileChunked[T any](ginContext *gin.Context, dbconn *gorm.DB, query, filename string, chunkSize int) error {
 	chunker := NewChunker[T](ginContext)
+	defer chunker.Writer.Flush()
+
 	cursor, err := NewCursor[T](dbconn, query, chunkSize)
 	if err != nil {
 		return err
 	}
+	defer cursor.Close()
 
 	chunker.SetHeader(filename)
 	chunker.WriteCsvLabel()
-	defer chunker.Writer.Flush()
 
 	if err := TransferChunk[T](chunker, cursor); err != nil {
 		return err

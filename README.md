@@ -20,6 +20,7 @@ go get github.com/innodep-tms/csvutil
 ### Usage
 ***
 #### 일반 사용 예시 (gin-gonic handler)
+* csv 태그를 이용하여 테이블 라벨을 지정할 수 있다.
 ```
 package handler
 
