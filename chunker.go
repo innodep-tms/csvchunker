@@ -65,25 +65,39 @@ func (chunker *Chunker[T]) WriteChunk(data []T) error {
 				case "string":
 					value = f.Value().(string)
 				case "*string":
-					value = *f.Value().(*string)
+					p := f.Value().(*string)
+					if p != nil {
+						value = *p
+					}
 				case "int":
 					value = strconv.Itoa(f.Value().(int))
 				case "*int":
-					value = strconv.Itoa(*f.Value().(*int))
+					p := f.Value().(*int)
+					if p != nil {
+						value = strconv.Itoa(*p)
+					}
 				case "int64":
 					value = strconv.FormatInt(f.Value().(int64), 10)
 				case "*int64":
-					value = strconv.FormatInt(*f.Value().(*int64), 10)
+					p := f.Value().(*int64)
+					if p != nil {
+						value = strconv.FormatInt(*p, 10)
+					}
 				case "float32":
 					value = strconv.FormatFloat(float64(f.Value().(float32)), 'f', -6, 32)
 				case "*float32":
-					value = strconv.FormatFloat(float64(*f.Value().(*float32)), 'f', -6, 32)
+					p := f.Value().(*float32)
+					if p != nil {
+						value = strconv.FormatFloat(float64(*p), 'f', -6, 32)
+					}
 				case "float64":
 					value = strconv.FormatFloat(f.Value().(float64), 'f', -6, 64)
 				case "*float64":
-					value = strconv.FormatFloat(*f.Value().(*float64), 'f', -6, 64)
+					p := f.Value().(*float64)
+					if p != nil {
+						value = strconv.FormatFloat(*p, 'f', -6, 64)
+					}
 				}
-
 				row = append(row, value)
 			}
 		}
